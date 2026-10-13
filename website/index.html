@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PreRoute AI — 공급망 선제 의사결정 대시보드</title>
+<meta name="description" content="글로벌 물류 리스크를 48시간 전에 감지하고, 마진을 지키는 최적 우회 경로 Top 3를 처방하는 SCM 인텔리전스 대시보드">
+<link rel="stylesheet" href="style.css">
+<script>
+  // Intro (ship wake) runs only when motion is allowed. Failsafe reveals the page even if intro.js never runs.
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.documentElement.classList.add("intro-on");
+    setTimeout(function () {
+      if (!document.documentElement.classList.contains("intro-end")) {
+        document.documentElement.classList.add("intro-end");
+        document.dispatchEvent(new Event("intro:end"));
+      }
+    }, 8000);
+  }
+</script>
+</head>
+<body>
+
+<div class="intro" id="intro"><canvas id="introCanvas" aria-hidden="true"></canvas><button class="intro-skip" id="introSkip" type="button">건너뛰기</button></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M6 26V6h10a6 6 0 0 1 0 12H6m10 0 8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="9" r="2.6" fill="#F59E0B"/></svg>
+      </span>
+      <span class="brand-name">PreRoute <b>AI</b></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#scenario">상황별 시나리오</a>
+      <a href="#features">핵심 화면</a>
+      <a href="#how">작동 방식</a>
+      <a href="#why">차별점</a>
+    </nav>
+    <a href="#contact" class="btn btn-primary btn-sm">도입 문의</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap hero-copy">
+    <span class="pill"><span class="dot-live"></span>SCM Disruption Intelligence</span>
+    <h1>보이지 않던 위기까지,<br><em>한 눈에 우회</em>합니다</h1>
+    <p class="hero-sub">전 세계 3,000개 항만의 리스크를 <b>48시간 전</b>에 감지하고,<br class="br-pc"> 위약금과 추가 운임을 계산해 마진을 지키는 <b>최적 우회 경로 Top 3</b>를 처방합니다.</p>
+    <div class="hero-cta">
+      <a href="#scenario" class="btn btn-primary">대시보드 둘러보기</a>
+      <a href="#how" class="btn btn-ghost">작동 방식 보기</a>
+    </div>
+    <ul class="hero-stats">
+      <li><strong data-count="48" data-suffix="h">0h</strong><span>선제 감지</span></li>
+      <li><strong class="t-amber">Top 3</strong><span>최적 우회 경로</span></li>
+      <li><strong data-count="85" data-suffix="%">0%</strong><span>최대 손실 방어</span></li>
+    </ul>
+  </div>
+
+  <!-- ============ DASHBOARD MOCKUP ============ -->
+  <div class="wrap" id="scenario">
+    <div class="scenario-bar" role="tablist" aria-label="상황별 시나리오">
+      <span class="scenario-label">상황별 시나리오</span>
+      <button class="sc-tab is-active" role="tab" data-sc="redsea">홍해 · 수에즈 정체</button>
+      <button class="sc-tab" role="tab" data-sc="typhoon">남중국해 태풍</button>
+      <button class="sc-tab" role="tab" data-sc="strike">로테르담 항만 파업</button>
+    </div>
+
+    <div class="device">
+      <div class="device-bar"><i></i><i></i><i></i><span>app.preroute.ai/dashboard</span></div>
+      <div class="dash">
+        <!-- sidebar -->
+        <aside class="dash-side">
+          <div class="side-brand"><span class="brand-mark sm"><svg viewBox="0 0 32 32"><path d="M6 26V6h10a6 6 0 0 1 0 12H6m10 0 8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="9" r="2.6" fill="#F59E0B"/></svg></span>PreRoute</div>
+          <ul class="side-nav">
+            <li class="on"><span class="ic">◎</span>관제 대시보드</li>
+            <li><span class="ic">▤</span>선적 현황</li>
+            <li><span class="ic">△</span>리스크 알림 <em class="badge-amber" id="sideAlert">12</em></li>
+            <li><span class="ic">⤳</span>대체 경로</li>
+            <li><span class="ic">▦</span>리포트</li>
+            <li><span class="ic">⎘</span>계약 데이터</li>
+          </ul>
+          <div class="side-foot">
+            <span class="sync"><span class="dot-live"></span>ERP 동기화됨</span>
+            <small>포워더 요율표 24건 · 계약서 61건</small>
+          </div>
+        </aside>
+
+        <!-- main -->
+        <div class="dash-main">
+          <div class="dash-top">
+            <div>
+              <div class="crumb">관제 대시보드</div>
+              <div class="dash-title">글로벌 선적 리스크 현황</div>
+            </div>
+            <div class="dash-meta">
+              <span class="live"><span class="dot-live"></span>실시간 · 3,000개 항만</span>
+              <span class="updated" id="updated">방금 업데이트</span>
+              <span class="avatar">SCM</span>
+            </div>
+          </div>
+
+          <!-- alert -->
+          <div class="alert" id="alert">
+            <span class="alert-ic">!</span>
+            <div class="alert-body">
+              <b id="alertTitle">홍해 · 수에즈 통항 정체 리스크 감지</b>
+              <span id="alertDesc">영향 선적 12건 · 예상 지연 9일 · 지연 시 예상 위약금 ₩8.4억</span>
+            </div>
+            <span class="alert-time" id="alertTime">D-2 · 48시간 전 감지</span>
+          </div>
+
+          <!-- KPIs -->
+          <div class="kpis">
+            <div class="kpi"><span class="kpi-l">모니터링 선적</span><span class="kpi-v" id="kShip">248</span><span class="kpi-s">32개 항로</span></div>
+            <div class="kpi"><span class="kpi-l">리스크 선적</span><span class="kpi-v t-amber" id="kRisk">12</span><span class="kpi-s" id="kRiskS">48시간 내 영향</span></div>
+            <div class="kpi"><span class="kpi-l">지연 시 예상 손실</span><span class="kpi-v" id="kLoss">₩8.4억</span><span class="kpi-s">위약금 + 기회비용</span></div>
+            <div class="kpi kpi-hi"><span class="kpi-l">PreRoute 방어 가능액</span><span class="kpi-v" id="kSave">₩7.1억</span><span class="kpi-s"><b id="kRate">85%</b> 손실 방어</span></div>
+          </div>
+
+          <!-- map + routes -->
+          <div class="grid-main">
+            <div class="card map-card">
+              <div class="card-h">
+                <span>경로 리스크 맵</span>
+                <span class="legend"><i class="lg-base"></i>기존 경로 <i class="lg-risk"></i>리스크 <i class="lg-alt"></i>추천 경로</span>
+              </div>
+              <div class="map-wrap"><svg id="map" viewBox="0 0 760 460" preserveAspectRatio="xMidYMid meet" aria-label="경로 리스크 지도"></svg></div>
+            </div>
+
+            <div class="card routes-card">
+              <div class="card-h"><span>실행 가능한 대체 경로 Top 3</span><span class="muted" id="routeLane">부산 → 로테르담</span></div>
+              <ol class="routes" id="routes"></ol>
+              <button class="btn btn-primary btn-block" id="confirmBtn">추천 경로 원클릭 확정</button>
+            </div>
+          </div>
+
+          <!-- bottom -->
+          <div class="grid-bottom">
+            <div class="card">
+              <div class="card-h"><span>손익 비교 · 아무것도 하지 않을 때 vs 추천 경로</span></div>
+              <div class="compare">
+                <div class="cmp-row">
+                  <span class="cmp-l">지연 방치</span>
+                  <div class="cmp-track"><div class="cmp-bar bar-gray" id="barBase"></div></div>
+                  <span class="cmp-v" id="vBase">₩8.4억</span>
+                </div>
+                <div class="cmp-row">
+                  <span class="cmp-l t-blue">추천 경로</span>
+                  <div class="cmp-track"><div class="cmp-bar bar-blue" id="barAlt"></div></div>
+                  <span class="cmp-v t-blue" id="vAlt">₩1.3억</span>
+                </div>
+                <p class="cmp-note" id="cmpNote">추가 운임 ₩0.9억을 쓰고 위약금 ₩7.5억을 피합니다.</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><span>자동 생성 문서</span><span class="muted">확정 시 즉시 발행</span></div>
+              <ul class="docs">
+                <li><span class="doc-ic">▦</span><div><b>C-레벨 재무 분석 보고서</b><small>예상 손실 · 방어액 · 대안 비교</small></div><span class="doc-st" data-doc>대기</span></li>
+                <li><span class="doc-ic">✉</span><div><b>Buyer Delay Notice (EN)</b><small>공식 지연 대응 안내문 · 타임라인 포함</small></div><span class="doc-st" data-doc>대기</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- floating callouts -->
+    <div class="callouts">
+      <div class="callout"><span class="co-n">1</span><div><b>48시간 전 경고</b><p>지연이 터지기 전, 골든타임 안에 알립니다.</p></div></div>
+      <div class="callout"><span class="co-n">2</span><div><b>손익으로 비교한 Top 3</b><p>위약금 손실과 추가 운임을 한 화면에서 계산합니다.</p></div></div>
+      <div class="callout"><span class="co-n">3</span><div><b>원클릭 확정</b><p>보고서와 바이어 안내문이 바로 만들어집니다.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">핵심 화면</span>
+      <h2>관제에서 멈추지 않고,<br><em>행동을 처방</em>합니다</h2>
+      <p>기존 솔루션은 "선박이 늦어지고 있다"까지만 알려줍니다. PreRoute는 무엇을 해야 하는지, 그러면 얼마를 지킬 수 있는지까지 보여줍니다.</p>
+    </div>
+
+    <div class="feat-grid">
+      <!-- feature 1 -->
+      <article class="feat reveal">
+        <div class="feat-ui">
+          <div class="notif">
+            <div class="notif-h"><span class="alert-ic sm">!</span><b>리스크 감지</b><time>방금</time></div>
+            <p><b>로테르담항 파업 예고</b><br>선적 15건 · 도착 예정 D+7</p>
+            <div class="notif-bar"><span style="width:82%"></span></div>
+            <small>지연 확률 82% · 48시간 전 알림</small>
+          </div>
+          <div class="notif ghost">
+            <div class="notif-h"><span class="alert-ic sm muted-ic">i</span><b>운임 변동</b><time>12분 전</time></div>
+            <p>아시아–북유럽 BAF 4.2% 상승</p>
+          </div>
+        </div>
+        <h3>48시간 전 리스크 알림</h3>
+        <p>기상, 항만, 운임 데이터를 실시간으로 분석해 지연 가능성이 보이는 순간, 영향받는 선적과 예상 손실을 함께 알려줍니다.</p>
+      </article>
+
+      <!-- feature 2 -->
+      <article class="feat reveal">
+        <div class="feat-ui">
+          <div class="mini-table">
+            <div class="mt-row mt-head"><span>경로</span><span>지연</span><span>순손실</span></div>
+            <div class="mt-row mt-best"><span><em class="rank">1</em>희망봉 우회</span><span>+4일</span><span class="t-blue"><b>₩1.3억</b></span></div>
+            <div class="mt-row"><span><em class="rank g">2</em>Sea-Air 환적</span><span>+1일</span><span>₩4.0억</span></div>
+            <div class="mt-row"><span><em class="rank g">3</em>수에즈 대기</span><span>+9일</span><span>₩6.1억</span></div>
+          </div>
+        </div>
+        <h3>손익 기준 대체 경로 Top 3</h3>
+        <p>포워더별 계약 요율과 바이어 지체상금 조항을 변수로 계산해, 가장 빠른 길이 아니라 <b>가장 덜 잃는 길</b>을 추천합니다.</p>
+      </article>
+
+      <!-- feature 3 -->
+      <article class="feat reveal">
+        <div class="feat-ui">
+          <div class="doc-tabs" role="tablist">
+            <button class="dt is-active" data-doc-tab="clevel">C-레벨 보고서</button>
+            <button class="dt" data-doc-tab="buyer">Buyer Notice</button>
+          </div>
+          <div class="doc-paper" data-doc-panel="clevel">
+            <div class="dp-title">공급망 리스크 대응 보고</div>
+            <div class="dp-kv"><span>예상 손실 (방치 시)</span><b>₩8.4억</b></div>
+            <div class="dp-kv"><span>추천안 적용 시</span><b>₩1.3억</b></div>
+            <div class="dp-kv hi"><span>방어 금액</span><b>₩7.1억 (85%)</b></div>
+            <div class="dp-lines"><i></i><i></i><i style="width:60%"></i></div>
+          </div>
+          <div class="doc-paper" data-doc-panel="buyer" hidden>
+            <div class="dp-title en">Notice of Shipment Rerouting</div>
+            <p class="dp-en">Dear Valued Partner, due to congestion in the Red Sea, shipment PO-24117 will be rerouted via the Cape of Good Hope.</p>
+            <div class="dp-tl"><span>Oct 15<br><b>Depart</b></span><span>Nov 18<br><b>Cape</b></span><span>Dec 02<br><b>Arrive</b></span></div>
+          </div>
+        </div>
+        <h3>원클릭 보고서 · 안내문 발행</h3>
+        <p>경로를 확정하는 순간 경영진 보고용 재무 분석표와 바이어에게 보낼 영문 지연 안내문이 함께 만들어집니다.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PERSONA ============ -->
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">누가 쓰나요</span>
+      <h2>같은 위기, 각자 필요한 답을 <em>한 화면</em>에서</h2>
+    </div>
+    <div class="persona-grid">
+      <div class="persona reveal">
+        <span class="tag">의사결정권자</span>
+        <h3>SCM 총괄 임원</h3>
+        <p class="p-q">"이번 지연으로 이번 분기 마진이 얼마나 깎이는지, 지금 당장 숫자로 알고 싶다."</p>
+        <ul>
+          <li>예상 손실액과 방어 가능액을 한눈에 확인</li>
+          <li>대안별 재무 영향 비교 후 즉시 승인</li>
+        </ul>
+      </div>
+      <div class="persona reveal">
+        <span class="tag tag-amber">실무 리드</span>
+        <h3>물류기획팀장</h3>
+        <p class="p-q">"수십 개 포워더에 전화 돌리고 엑셀로 다시 계산하는 야근은 그만하고 싶다."</p>
+        <ul>
+          <li>포워더 요율 자동 비교로 재견적 업무 제거</li>
+          <li>보고서 · 바이어 안내문 자동 작성</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW ============ -->
+<section class="section" id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">작동 방식</span>
+      <h2>업로드부터 바이어 안내문까지, <em>3단계</em></h2>
+    </div>
+    <ol class="steps">
+      <li class="step reveal">
+        <span class="step-n">01</span><span class="step-k">INPUT</span>
+        <h3>데이터 자동 동기화</h3>
+        <p>ERP/TMS를 바꿀 필요 없이 포워더 요율표, 바이어 계약서, 선적 정보를 업로드하거나 경량 API로 연결합니다.</p>
+      </li>
+      <li class="step step-hi reveal">
+        <span class="step-n">02</span><span class="step-k">ANALYZE &amp; PRESCRIBE</span>
+        <h3>리스크 감지 및 처방</h3>
+        <p>지연 리스크가 포착되면 48시간 전에 알리고, 위약금 손실과 우회 운임을 비교한 대체 경로 Top 3를 제시합니다.</p>
+      </li>
+      <li class="step reveal">
+        <span class="step-n">03</span><span class="step-k">EXECUTE</span>
+        <h3>원클릭 확정</h3>
+        <p>추천 경로를 선택하면 경영진 보고서와 영문 바이어 안내문이 즉시 생성됩니다.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ WHY ============ -->
+<section class="section section-alt" id="why">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">차별점</span>
+      <h2>기존 솔루션이 풀지 못한 영역</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why reveal"><span class="why-n">01</span><h3>계약서까지 읽는 도큐먼트 AI</h3><p>PDF·엑셀로 흩어진 요율표와 지체상금 조항을 실시간 계산 변수로 바꿉니다.</p></div>
+      <div class="why reveal"><span class="why-n">02</span><h3>포워더 중립</h3><p>운임을 팔지 않는 독립 소프트웨어라, 오직 화주의 순이익 기준으로 비교합니다.</p></div>
+      <div class="why reveal"><span class="why-n">03</span><h3>제로 트러스트 · 당일 도입</h3><p>핵심 정보만 격리된 보안 인스턴스에서 연산해 ERP 교체 없이 바로 씁니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta" id="contact">
+  <div class="wrap cta-inner">
+    <div>
+      <h2>바다는 멈춰도,<br>귀사의 공급망은 멈추지 않습니다.</h2>
+      <p>보유한 요율표와 계약서로 우리 회사 데이터 기반 데모를 받아보세요.</p>
+    </div>
+    <form class="cta-form" id="ctaForm">
+      <input type="email" required placeholder="업무용 이메일" aria-label="업무용 이메일">
+      <button class="btn btn-amber" type="submit">데모 신청</button>
+      <small class="cta-msg" id="ctaMsg" aria-live="polite"></small>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap foot-inner">
+    <span class="brand-name">PreRoute <b>AI</b></span>
+    <span>#처방형SCM #경로선점 #마진디펜스 #공급망인텔리전스 #제로트러스트SaaS</span>
+    <span>© 2026 PreRoute AI · 제품 콘셉트 시안</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="intro.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
