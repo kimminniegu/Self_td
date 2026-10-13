@@ -1,7 +1,7 @@
 /* ===== Fonts ===== */
-@font-face { font-family: "NanumSquareNeo"; src: url("../fonts/nanum_square_neo_rg.otf") format("opentype"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "NanumSquareNeo"; src: url("../fonts/nanum_square_neo_bd.otf") format("opentype"); font-weight: 700; font-display: swap; }
-@font-face { font-family: "NanumSquareNeo"; src: url("../fonts/nanum_square_neo_eb.otf") format("opentype"); font-weight: 800; font-display: swap; }
+@font-face { font-family: "NanumSquareNeo"; src: url("fonts/nanum_square_neo_rg.otf") format("opentype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "NanumSquareNeo"; src: url("fonts/nanum_square_neo_bd.otf") format("opentype"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "NanumSquareNeo"; src: url("fonts/nanum_square_neo_eb.otf") format("opentype"); font-weight: 800; font-display: swap; }
 
 /* ===== Tokens (brand: white/gray 80 · blue 15 · amber 5) ===== */
 :root {
